@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Calculator</title>
+    <script src="/scripts/APICalculator.js"></script>
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="input-fields">
+            <h2>Loan Calculator</h2>
+            <label>Loan Amount ($): <input type="number" id="loanAmount" value="16174.79"/></label><br>
+            <label>Interest Rate (%): <input type="number" id="interestRate" value="5"/></label><br>
+            <label>Duration (Months): <input type="number" id="duration" value="24"/></label><br>
+            <button id="calculateButton">Calculate</button>
+            <button id="saveButton">Save</button>
+            <br>
+            <div class="results">
+                <p>Total Paid: $<span id="totalPaid">0.00</span></p>
+                <p>Total Interest: $<span id="totalInterest">0.00</span></p>
+                <p>Remaining debt: $<span id="debtRemaining">0.00</span></p>
+            </div>
+
+        </div>
+
+        <div class="tableContainer">
+            <table id="scheduleTable">
+            <thead>
+                <tr>
+                <th>Month</th>
+                <th>Payment</th>
+                <th>Interest</th>
+                <th>Remaining Debt</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
