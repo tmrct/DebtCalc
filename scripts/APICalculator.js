@@ -38,12 +38,16 @@ function calculateLoan() {
 }
 
 function renderSavedData() {
-    fetch('/data/scheduleData.json')
-        .then(data => {
-            data.json().then(parsedData => {
-                scheduleData = Array.isArray(parsedData) ? parsedData : [];
-                renderTable();
-            });
+    fetch('../data/scheduleData.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(parsedData => {
+            scheduleData = Array.isArray(parsedData) ? parsedData : [];
+            renderTable();
         })
         .catch(error => console.error('Error loading schedule data:', error));
 }
@@ -137,6 +141,7 @@ function calculateTotals() {
     document.getElementById("totalInterest").textContent = totalInterest.toFixed(2);
     document.getElementById("debtRemaining").textContent = debtRemaining.toFixed(2);
 }
+
 function saveDataToFile() {
     const dataStr = JSON.stringify(scheduleData, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
@@ -148,7 +153,7 @@ function saveDataToFile() {
     URL.revokeObjectURL(url);
 
     // Write to data/scheduleData.json
-    fetch('/data/scheduleData.json', {
+    fetch('http://localhost:3000/data/scheduleData', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -163,4 +168,3 @@ function saveDataToFile() {
         console.error('There was a problem with the fetch operation:', error);
     });
 }
-
