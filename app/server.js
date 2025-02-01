@@ -1,7 +1,12 @@
+const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors');
+const app = express();
+const port = process.env.PORT || 3000;
 
-// Ensure the data directory exists
+app.use(cors());
+app.use(express.json());
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
@@ -31,4 +36,7 @@ app.post('/data/scheduleData', (req, res) => {
         }
         res.send('Data successfully saved to server');
     });
+});
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
 });
