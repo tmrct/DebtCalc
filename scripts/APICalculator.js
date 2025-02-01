@@ -38,7 +38,7 @@ function calculateLoan() {
 }
 
 function renderSavedData() {
-    fetch('https://debtcalc.onrender.com/data/scheduleData')
+    fetch('../data/scheduleData.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -64,11 +64,12 @@ function renderTable() {
     scheduleData.forEach((entry, index) => {
         let entryDate = new Date(entry.date);
         let row = `<tr${isAfter15th && entryDate.getFullYear() === currentYear && entryDate.getMonth() === currentMonth ? ' style="background-color: green;"' : ''}>
-                    <td>${entry.date}</td>
-                    <td><input type="number" value="${entry.payment.toFixed(2)}" onchange="updatePayment(${index}, this.value)" /></td>
-                    <td>$${entry.interest.toFixed(2)}</td>
-                    <td>$${entry.balance.toFixed(2)}</td>
-                </tr>`;
+                <td>${entry.date}</td>
+                <td><input type="number" value="${entry.payment.toFixed(2)}" onchange="updatePayment(${index}, this.value)" /></td>
+                <td>$${entry.interest.toFixed(2)}</td>
+                <td>$${entry.balance.toFixed(2)}</td>
+                <td><textarea onchange="updateDatePaid(${index}, this.value)">${entry.datePaid || ''}</textarea></td>
+            </tr>`;
         tableBody.innerHTML += row;
     });
     calculateTotals();
@@ -79,6 +80,10 @@ function updatePayment(index, newPayment) {
     if (isNaN(newPayment) || newPayment < 0) return;
     scheduleData[index].payment = newPayment;
     recalculateSchedule();
+}
+
+function updateDatePaid(index, newDatePaid) {
+    scheduleData[index].datePaid = newDatePaid;
 }
 
 function recalculateSchedule() {
@@ -153,19 +158,20 @@ async function saveDataToFile() {
     a.click();
     URL.revokeObjectURL(url);
 
-    fetch('https://debtcalc.onrender.com/data/scheduleData', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: dataStr
-    }).then(response => {
+    try {
+        const response = await fetch('http://localhost:3000/data/scheduleData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: dataStr
+        });
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
         console.log('Data successfully saved to server');
-    }).catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-    });
+    } catch (error) {
+        console.error('Error saving data:', error);
+    }
 }
 
