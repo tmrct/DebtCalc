@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loan Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/scripts/APICalculator.js"></script>
     <link rel="stylesheet" href="/styles/styles.css">
 </head>
@@ -22,7 +23,8 @@
                 <p>Total Interest: $<span id="totalInterest">0.00</span></p>
                 <p>Remaining debt: $<span id="debtRemaining">0.00</span></p>
             </div>
-
+            <br>
+            <canvas id="debtChart" width="400" height="200"></canvas>
         </div>
 
         <div class="tableContainer">

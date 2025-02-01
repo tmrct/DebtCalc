@@ -1,4 +1,5 @@
 let scheduleData = [];
+let debtChart = null;
 
 document.addEventListener("DOMContentLoaded", function () {
     renderSavedData();
@@ -52,18 +53,15 @@ function renderSavedData() {
         .catch(error => console.error('Error loading schedule data:', error));
 }
 
-
 function renderTable() {
     let tableBody = document.querySelector("#scheduleTable tbody");
     tableBody.innerHTML = "";
     let currentDate = new Date();
-    let currentMonth = currentDate.getMonth();
-    let currentYear = currentDate.getFullYear();
-    let isAfter15th = currentDate.getDate() > 15;
 
     scheduleData.forEach((entry, index) => {
         let entryDate = new Date(entry.date);
-        let row = `<tr${isAfter15th && entryDate.getFullYear() === currentYear && entryDate.getMonth() === currentMonth ? ' style="background-color: green;"' : ''}>
+        let isBeforeToday = entryDate < currentDate;
+        let row = `<tr${isBeforeToday ? ' style="background-color: #6dbfb8;"' : ''}>
                 <td>${entry.date}</td>
                 <td><input type="number" value="${entry.payment.toFixed(2)}" onchange="updatePayment(${index}, this.value)" /></td>
                 <td>$${entry.interest.toFixed(2)}</td>
@@ -73,6 +71,7 @@ function renderTable() {
         tableBody.innerHTML += row;
     });
     calculateTotals();
+    renderDebtGraph();
 }
 
 function updatePayment(index, newPayment) {
@@ -136,12 +135,11 @@ function calculateTotals() {
 
     scheduleData.forEach((entry) => {
         let entryDate = new Date(entry.date);
-        if (entryDate.getFullYear() < currentYear || (entryDate.getFullYear() === currentYear && entryDate.getMonth() <= currentMonth)) {
+        if ((entryDate.getFullYear() < currentYear || (entryDate.getFullYear() === currentYear && entryDate.getMonth() <= currentMonth)) && entry.datePaid) {
             totalPaid += entry.payment;
             totalInterest += entry.interest;
             debtRemaining = entry.balance;
         }
-        console.log(debtRemaining);
     });
     document.getElementById("totalPaid").textContent = totalPaid.toFixed(2);
     document.getElementById("totalInterest").textContent = totalInterest.toFixed(2);
@@ -175,3 +173,56 @@ async function saveDataToFile() {
     }
 }
 
+function renderDebtGraph() {
+    if (debtChart) {
+        debtChart.destroy(); // Destroy the existing chart instance
+    }
+    const ctx = document.getElementById('debtChart').getContext('2d');
+    const labels = scheduleData.map(entry => entry.date);
+    const paidData = scheduleData.map((entry, index) => {
+        return scheduleData.slice(0, index + 1).reduce((sum, current) => sum + (current.payment - current.interest), 0);
+    });
+    const remainingData = scheduleData.map(entry => entry.balance);
+
+    debtChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Debt Paid',
+                    data: paidData,
+                    borderColor: 'rgb(75, 192, 130)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: false
+                },
+                {
+                    label: 'Remaining Debt',
+                    data: remainingData,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Amount ($)'
+                    }
+                }
+            }
+        }
+    });
+}

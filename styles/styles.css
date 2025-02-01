@@ -17,6 +17,10 @@ body {
     flex-direction: row;
     justify-content: space-around;
 }
+.input-fields { 
+    width: 30%; 
+    margin-right: 20px; 
+}
 h2 { 
     color: #007BFF; 
 }
@@ -74,4 +78,59 @@ p {
 #debtRemaining { 
     font-weight: bold; 
     color: #eb1212; 
+}
+@media (max-width: 1300px) {
+    .container {
+        width: 100%;
+        margin: 20px auto;
+        padding: 10px;
+        flex-direction: column;
+    }
+    .input-fields {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+    input[type="number"] {
+        width: calc(100% - 20px);
+    }
+    button {
+        width: 100%;
+    }
+    table {
+        font-size: 14px;
+    }
+    th, td {
+        padding: 5px;
+    }
+}
+@media print {
+    body {
+        background-color: #fff;
+        color: #000;
+    }
+    .container {
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+    .input-fields, button {
+        display: none;
+    }
+    table {
+        width: 100%;
+        border: 1px solid #000;
+    }
+    th, td {
+        border: 1px solid #000;
+        padding: 10px;
+    }
+    th {
+        background-color: #ddd;
+        color: #000;
+    }
+    p {
+        font-size: 16px;
+    }
 }
