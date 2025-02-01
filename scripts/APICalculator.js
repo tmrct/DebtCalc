@@ -153,7 +153,7 @@ async function saveDataToFile() {
     a.click();
     URL.revokeObjectURL(url);
 
-    fetch('http://localhost:3000/data/scheduleData', {
+    fetch('https://debtcalc.onrender.com/data/scheduleData', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
