@@ -38,7 +38,7 @@ function calculateLoan() {
 }
 
 function renderSavedData() {
-    fetch('../data/scheduleData.json')
+    fetch('https://debtcalc.onrender.com/data/scheduleData')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);

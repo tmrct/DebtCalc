@@ -3,14 +3,24 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-
+app.get('/data/scheduleData', (req, res) => {
+    const filePath = path.join(__dirname, 'data', 'scheduleData.json');
+    
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error reading file:', err);
+            return res.status(500).send('Server error');
+        }
+        res.send(JSON.parse(data));
+    });
+});
 app.post('/data/scheduleData', (req, res) => {
     const data = JSON.stringify(req.body, null, 2);
-    const filePath = path.join(__dirname, '../data', 'scheduleData.json');
+    const filePath = path.join(__dirname, 'data', 'scheduleData.json');
     
     fs.writeFile(filePath, data, (err) => {
         if (err) {
@@ -22,5 +32,5 @@ app.post('/data/scheduleData', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running at https://debtcalc.onrender.com`);
+    console.log(`Server running at http://localhost:${port}`);
 });
