@@ -41,7 +41,7 @@ function renderSavedData() {
     fetch('../data/scheduleData.json')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
             return response.json();
         })
@@ -51,6 +51,7 @@ function renderSavedData() {
         })
         .catch(error => console.error('Error loading schedule data:', error));
 }
+
 
 function renderTable() {
     let tableBody = document.querySelector("#scheduleTable tbody");
@@ -142,7 +143,7 @@ function calculateTotals() {
     document.getElementById("debtRemaining").textContent = debtRemaining.toFixed(2);
 }
 
-function saveDataToFile() {
+async function saveDataToFile() {
     const dataStr = JSON.stringify(scheduleData, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -152,7 +153,6 @@ function saveDataToFile() {
     a.click();
     URL.revokeObjectURL(url);
 
-    // Write to data/scheduleData.json
     fetch('http://localhost:3000/data/scheduleData', {
         method: 'POST',
         headers: {
@@ -168,3 +168,4 @@ function saveDataToFile() {
         console.error('There was a problem with the fetch operation:', error);
     });
 }
+
