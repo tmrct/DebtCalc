@@ -62,11 +62,11 @@ function renderTable() {
         let entryDate = new Date(entry.date);
         let isBeforeToday = entryDate < currentDate;
         let row = `<tr${isBeforeToday ? ' style="background-color: #6dbfb8;"' : ''}>
-                <td>${entry.date}</td>
-                <td><input type="number" value="${entry.payment.toFixed(2)}" onchange="updatePayment(${index}, this.value)" /></td>
-                <td>$${entry.interest.toFixed(2)}</td>
-                <td>$${entry.balance.toFixed(2)}</td>
-                <td><textarea onchange="updateDatePaid(${index}, this.value)">${entry.datePaid || ''}</textarea></td>
+            <td>${entry.date}</td>
+            <td><input type="number" value="${entry.payment.toFixed(2)}" onchange="updatePayment(${index}, this.value)" /></td>
+            <td>$${entry.interest.toFixed(2)}</td>
+            <td>$${entry.balance.toFixed(2)}</td>
+            <td><textarea style="height:60px;" onchange="updateDatePaid(${index}, this.value)">${entry.datePaid || ''}</textarea></td>
             </tr>`;
         tableBody.innerHTML += row;
     });
