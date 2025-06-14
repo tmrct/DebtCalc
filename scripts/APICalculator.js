@@ -39,7 +39,7 @@ function calculateLoan() {
 }
 
 function renderSavedData() {
-    fetch('../data/scheduleData.json')
+    fetch('/data/scheduleData')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -50,7 +50,12 @@ function renderSavedData() {
             scheduleData = Array.isArray(parsedData) ? parsedData : [];
             renderTable();
         })
-        .catch(error => console.error('Error loading schedule data:', error));
+        .catch(error => {
+            console.error('Error loading schedule data:', error);
+            // Initialize with empty data if there's an error
+            scheduleData = [];
+            renderTable();
+        });
 }
 
 function renderTable() {
@@ -88,42 +93,48 @@ function updateDatePaid(index, newDatePaid) {
 function recalculateSchedule() {
     let loanAmount = parseFloat(document.getElementById("loanAmount").value);
     let interestRate = parseFloat(document.getElementById("interestRate").value) / 100 / 12;
-    let currentMonth = new Date().getMonth();
-    let currentYear = new Date().getFullYear();
-
+    
+    // Store the original dates before recalculating
+    const originalDates = scheduleData.map(entry => entry.date);
+    
     for (let i = 0; i < scheduleData.length; i++) {
         let interest = loanAmount * interestRate;
         let principal = scheduleData[i].payment - interest;
         loanAmount -= principal;
         if (loanAmount < 0) loanAmount = 0;
-
-        let monthIndex = (currentMonth + i) % 12;
-        let year = currentYear + Math.floor((currentMonth + i) / 12);
-        let formattedDate = new Date(year, monthIndex).toLocaleDateString("en-US", { month: 'long', year: 'numeric' });
-
-        scheduleData[i].date = formattedDate;
+        
+        // Keep the original date instead of generating a new one
         scheduleData[i].interest = interest;
         scheduleData[i].balance = loanAmount;
+        // No need to update the date - keep the existing one
     }
 
-    while (loanAmount > 0) {
-        let interest = loanAmount * interestRate;
-        let principal = scheduleData[scheduleData.length - 1].payment - interest;
-        loanAmount -= principal;
-        if (loanAmount < 0) loanAmount = 0;
-
+    // If there's still a balance after going through all payments,
+    // we need to add more entries
+    if (loanAmount > 0) {
         let lastEntry = scheduleData[scheduleData.length - 1];
         let lastDate = new Date(lastEntry.date);
-        let nextMonth = lastDate.getMonth() + 1;
-        let nextYear = lastDate.getFullYear();
-        if (nextMonth > 11) {
-            nextMonth = 0;
-            nextYear++;
+        
+        while (loanAmount > 0) {
+            // Move to next month for new entries
+            lastDate = new Date(lastDate);
+            lastDate.setMonth(lastDate.getMonth() + 1);
+            let formattedDate = lastDate.toLocaleDateString("en-US", { month: 'long', year: 'numeric' });
+            
+            let interest = loanAmount * interestRate;
+            let principal = lastEntry.payment - interest;
+            loanAmount -= principal;
+            if (loanAmount < 0) loanAmount = 0;
+            
+            scheduleData.push({ 
+                date: formattedDate, 
+                payment: lastEntry.payment, 
+                interest: interest, 
+                balance: loanAmount 
+            });
         }
-        let formattedDate = new Date(nextYear, nextMonth).toLocaleDateString("en-US", { month: 'long', year: 'numeric' });
-
-        scheduleData.push({ date: formattedDate, payment: lastEntry.payment, interest: interest, balance: loanAmount });
     }
+    
     renderTable();
 }
 function calculateTotals() {
